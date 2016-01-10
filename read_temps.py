@@ -1,17 +1,11 @@
-import os
+import os, sys, getopt
 import time
 import csv
 from datetime import datetime
 
-data_dir = "/home/pi/projects/read_temps/data/"
-
 # init the 1-wire interface
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
-
-# This is our sensor.
-# [todo] figure out how to enumerate this automagically
-temp_sensor='/sys/bus/w1/devices/3b-0000001921e8/w1_slave'
 
 # Get the raw temp from the probe
 def temp_raw():
@@ -34,18 +28,50 @@ def read_temp():
 		temp_f = temp_c * 9.0 / 5.0 + 32.0
 		return temp_c
 
-# Set us up a file to write to.
-d = datetime.now()
-date_time = d.strftime('%m%d%Y')
-data_file = data_dir + date_time + ".csv"
+def usage():
+	print "sudo read_temps.py --output [csv, JSON] --datadir /tmp/sensor_data"
 
-with open(data_file, 'wb', 0) as csvfile:
-	csvwriter = csv.writer(csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL)
-	while True:
-		t = datetime.now().ctime()
-		temp = read_temp()
-		print(t)
-		print(temp)
-		# Write our bits out to a CSV, flush it to a file, then sleep.
-		csvwriter.writerow([t, temp])
-		time.sleep(1)
+def main():
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "output="])
+	except getopt.GetoptError as err:
+		# print some help thing?
+		print(err)
+		usage()
+		sys.exit(2)
+	output = None
+	verbose = False
+	for o, a in opts:
+		if o in ("-v", "--verbose"):
+			verbose = True
+		elif o in ("-h", "--help"):
+			usage()
+			sys.exit(1)
+		elif o in ("-o", "--output"):
+			output = a
+		elif o in ("-d", "--datadir"):
+			data_dir = a
+		else:
+			assert False, "unhandled option"
+
+if !data_dir = '/home/pi/projects/read_temps/data/'
+sensor_id = '3b-0000001921e8'
+temp_sensor='/sys/bus/w1/devices/' + sensor_id + '/w1_slave'
+
+
+	# Set us up a file to write to.
+	d = datetime.now()
+	date_time = d.strftime('%m%d%Y')
+	data_file = data_dir + date_time + ".csv"
+
+	with open(data_file, 'wb', 0) as csvfile:
+		csvwriter = csv.writer(csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL)
+		while True:
+			t = datetime.now().ctime()
+			temp = read_temp()
+			print(t)
+			print(temp)
+			# Write our bits out to a CSV, flush it to a file, then sleep.
+			csvwriter.writerow([t, temp])
+			time.sleep(1)
+
