@@ -56,7 +56,7 @@ def jsonwriter(data_file, cook_name, epoch_time, sensor_id, temp):
         "temp": temp
     }
 
-    if os.path.isfile(data_file) != True:
+    if not os.path.isfile(data_file):
         with open(data_file, 'wb', 0) as first_write:
             header_data = {
                 "cook": cook_name,
