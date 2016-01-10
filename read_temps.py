@@ -10,6 +10,12 @@ temp_sensor = '/sys/bus/w1/devices/' + sensor_id + '/w1_slave'
 
 def usage():
 	print "sudo read_temps.py --help --output=[csv, JSON] --cookname=Turkey --datadir=/tmp/sensor_data"
+	print ""
+	print "	--help		print this help."
+	print " --output 	Set output type as CSV or JSON. CSV is default."
+	print " --cookname 	User friendly name for this cooking session. Defaults to current date."
+	print " --datadir 	Where to store the data collected."
+	print " --display 	Display temp readings on the rPI TFT. Requires CSV."
 
 # Get the raw temp from the probe
 def temp_raw():
@@ -49,23 +55,16 @@ def jsonwriter(data_file, cook_name, t, sensor_id, temp):
 			header_data = {
 				"cook": cook_name,
 				"startTime": t,
-				"data": {},
+				"data": [],
 			}
 			json.dump(header_data, first_write)
 	
 	with open(data_file, 'r+', 0) as file:
 		data = json.load(file)
-		data['data'].update(temp_data)
+		data['data'].append(temp_data)
 		file.seek(0)
 		file.write(json.dumps(data))
 		file.truncate
-		#json.dump(data, file)
-
-#	with open(data_file, mode="r+") as file:
-#		file.seek(0,2)
-#		position = file.tell() -1
-#		file.seek(position)
-#		file.write( ",{}]".format(json.dumps(temp_data)) )
 
 def main(argv):
 	try:
