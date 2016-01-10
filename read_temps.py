@@ -1,6 +1,6 @@
 import os
 import time
-import csv
+import json
 from datetime import datetime
 
 data_dir = "/home/pi/projects/read_temps/data/"
@@ -39,13 +39,12 @@ d = datetime.now()
 date_time = d.strftime('%m%d%Y')
 data_file = data_dir + date_time + ".csv"
 
-with open(data_file, 'wb', 0) as csvfile:
-	csvwriter = csv.writer(csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL)
+with open(data_file, 'wb', 0) as datafile:
 	while True:
-		t = datetime.now().ctime()
-		temp = read_temp()
-		print(t)
-		print(temp)
-		# Write our bits out to a CSV, flush it to a file, then sleep.
-		csvwriter.writerow([t, temp])
+		t = {
+			'probe': '3b-0000001921e8',
+			'time': time.mktime(datetime.now().timetuple()),
+			'temp': read_temp(),
+		}
+		json.dump(t, datafile)
 		time.sleep(1)
