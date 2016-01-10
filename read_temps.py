@@ -1,6 +1,6 @@
 import os, sys, getopt
 import time
-import csv
+import csv, json
 from datetime import datetime
 
 # Sensor.
@@ -32,10 +32,40 @@ def read_temp():
 		temp_f = temp_c * 9.0 / 5.0 + 32.0
 		return temp_c
 
-def csvwriter(data_file, cook_name, t, temp):
+def csvwriter(data_file, cook_name, t, sensor_id, temp):
 	with open(data_file, 'a', 0) as csvfile:
 		writer = csv.writer(csvfile, delimiter=",", quotechar="|", quoting=csv.QUOTE_MINIMAL)
-		writer.writerow([cook_name, t, temp])
+		writer.writerow([cook_name, sensor_id, t, temp])
+
+def jsonwriter(data_file, cook_name, t, sensor_id, temp):
+	temp_data = {
+		"sensor": sensor_id,
+		"time": t,
+		"temp": temp
+	}
+	
+	if os.path.isfile(data_file) != True:
+		with open(data_file, 'wb', 0) as first_write:
+			header_data = {
+				"cook": cook_name,
+				"startTime": t,
+				"data": {},
+			}
+			json.dump(header_data, first_write)
+	
+	with open(data_file, 'r+', 0) as file:
+		data = json.load(file)
+		data['data'].update(temp_data)
+		file.seek(0)
+		file.write(json.dumps(data))
+		file.truncate
+		#json.dump(data, file)
+
+#	with open(data_file, mode="r+") as file:
+#		file.seek(0,2)
+#		position = file.tell() -1
+#		file.seek(position)
+#		file.write( ",{}]".format(json.dumps(temp_data)) )
 
 def main(argv):
 	try:
@@ -86,9 +116,10 @@ def main(argv):
 		# Write our bits out, then sleep.
 		if output == "csv":
 			data_file = data_dir + cook_name + ".csv"
-			csvwriter(data_file, cook_name, t, temp)
+			csvwriter(data_file, cook_name, t, sensor_id, temp)
 		elif output == "json":
-			jsonwriter(data_dir, t, temp)
+			data_file = data_dir + cook_name + ".json"
+			jsonwriter(data_file, cook_name, t, sensor_id, temp)
 
 		time.sleep(1)
 
