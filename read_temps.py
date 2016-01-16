@@ -22,13 +22,14 @@ MAGENTA = (255, 0, 255)
 YELLOW = (255, 255, 0)
 
 def usage():
-    print "sudo read_temps.py --help --output=[csv, JSON] --cookname=Turkey"
-    print "--datadir=/tmp/sensor_data"
+    print "sudo read_temps.py --help --output=[csv, JSON] --cookname=Turkey \\"
+    print "--datadir=/tmp/sensor_data --offset=+20"
     print ""
     print " --help      print this help."
     print " --output    Set output type as CSV or JSON. CSV is default."
     print " --cookname  User friendly name for this cooking session. Defaults to current date."
     print " --datadir   Where to store the data collected."
+    print " --offset    Offset in degrees C from a standard reference"
     print " --verbose   Display temp readings on console."
 
 
@@ -39,7 +40,7 @@ def temp_raw():
     return lines
 
 
-def read_temp():
+def read_temp(offset):
     lines = temp_raw()
     while lines[0].strip()[-3] != 'Y':
         print lines[0].strip()[-3]
@@ -48,7 +49,7 @@ def read_temp():
     temp_output = lines[1].find('t=')
     if temp_output != -1:
         temp_string = lines[1].strip()[temp_output + 2:]
-        temp_c = float(temp_string) / 1000.0
+        temp_c = (float(temp_string) / 1000.0) + offset
         return temp_c
 
 
@@ -110,7 +111,7 @@ def tft_writer(temp_c):
 
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv, "ho:c:d:vt", ["help", "output=", "cookname=", "datadir=", "verbose", "tft"])
+        opts, args = getopt.getopt(argv, "ho:c:d:vts", ["help", "output=", "cookname=", "datadir=", "verbose", "tft", "offset="])
     except getopt.GetoptError as err:
         # print some help thing?
         print err
@@ -122,6 +123,7 @@ def main(argv):
     cook_name = None
     verbose = False
     tft = False
+    offset = None
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -137,6 +139,8 @@ def main(argv):
             verbose = True
         elif opt in ("-t", "--tft"):
             tft = True
+        elif opt in ("-s", "--offset"):
+            offset = arg
         else:
             assert False, "unhandled option"
 
@@ -153,7 +157,7 @@ def main(argv):
     cook_name = cook_name or date_time
 
     while True:
-        temp = read_temp()
+        temp = read_temp(offset)
         epoch_time = str(time.time())
         if tft:
             tft_writer(temp)
