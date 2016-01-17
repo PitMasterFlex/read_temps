@@ -33,12 +33,19 @@ def avg_temp(sensor):
     return float(total_temp)
 
 
-def run_wizard():
+def run_wizard(sensors):
     single_point = raw_input("Single point calibration? [Y/n] ")
     if str(single_point[0]).upper == "Y":
         hot_calibration = raw_input("Hot? [Y/n] ")
-        if str(hot_calibration[0]).upper == "Y":
-            sensors = enumerate_sensors()
+        for sensor in sensors:
+            if str(hot_calibration[0]).upper == "Y":
+                calibrate_hot(sensor)
+            else:
+                calibrate_cold(sensor)
+    else:
+        for sensor in sensors:
+            calibrate_hot(sensor)
+            calibrate_cold(sensor)
 
 
 def main(argv):
@@ -57,6 +64,7 @@ def main(argv):
     verbose = False
     tft = False
     offset = None
+    sensors = enumerate_sensors()
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -76,4 +84,3 @@ def main(argv):
             offset = arg
         else:
             assert False, "unhandled option"
-
