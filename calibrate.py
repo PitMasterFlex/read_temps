@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import getopt
-import lib.commonmak
+import lib.common
 
 def usage():
     print "sudo read_temps.py --help --one-point=[hot/cold] --two-point \\"
@@ -17,17 +17,37 @@ def usage():
     print " --verbose   Display temp readings on console."
 
 
-def calibrate_hot(sensor):
-    pass
+def calibrate_hot(sensor, help=True):
+    if help:
+        print "The 'hot' calibraiton finds the differenance between what the"
+        print "sensor reads and the actual boiling point of water."
+        print ""
+        print "To do this, bring 3 inches of water to a rolling boil,"
+        input("place the sensor in the water, then press enter to calibrate.")
+    offset = -1 * (100 - avg_temp(sensor))
+    print "Hot offset for " + sensor + "is " + offset + " C"
+    return offset
 
-def calibrate_cold(sensor):
-    pass
+
+def calibrate_cold(sensor, help=True):
+    if help:
+        print "The 'cold' calibraiton finds the differenance between what the"
+        print "sensor reads and the actual freezing point of water."
+        print ""
+        print "To do this, fill a tall glass with ice, then cold water. Then,"
+        print "wait one minute, and then swirl the sensor in the water."
+        input("Press enter when you're ready to calibrate")
+    offset = -1 * (100 - avg_temp(sensor))
+    print "Cold offset for " + sensor + "is " + offset + " C"
+    return offset
 
 
 def avg_temp(sensor):
     total_temp = None
-    for i in range(0,2):
-        total_temp = floattotal_temp + read_temp(0,sensor)
+    for i in range(0, 2):
+        raw_temp = read_temp(0, sensor)
+        print "Raw tem " + raw_temp + "C Reading " + (i + 1)
+        total_temp = total_temp + raw_temp
         time.sleep(2)
 
     return float(total_temp)
@@ -49,38 +69,8 @@ def run_wizard(sensors):
 
 
 def main(argv):
-    pass
-    try:
-        opts, args = getopt.getopt(argv, "hot:c:d:vts", ["help", "one-point=", "two-point", "datadir=", "verbose", "tft", "offset="])
-    except getopt.GetoptError as err:
-        # print some help thing?
-        print err
-        usage()
-        sys.exit(2)
-
-    output = None
-    data_dir = None
-    cook_name = None
-    verbose = False
-    tft = False
-    offset = None
     sensors = enumerate_sensors()
+    run_wizard(sensors)
 
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            usage()
-            sys.exit(1)
-        elif opt in ("-o", "--output"):
-            output = arg
-        elif opt in ("-c", "--cookname"):
-            cook_name = arg
-        elif opt in ("-d", "--datadir"):
-            data_dir = arg
-        elif opt in ("-v", "--verbose"):
-            verbose = True
-        elif opt in ("-t", "--tft"):
-            tft = True
-        elif opt in ("-s", "--offset"):
-            offset = arg
-        else:
-            assert False, "unhandled option"
+if __name__ == "__main__":
+    main(sys.argv[1:])
