@@ -48,6 +48,15 @@ def read_temp(sensor=None, offset=None):
         return temp_c
 
 
+def find_temp_sensors():
+    """
+    Looks on system for temp sensors and returns all that it finds in a list
+
+    :return list: List containing all sensors.
+    """
+    # Hard coded for now while we work out the best way to hand this.
+    return ["/sys/bus/w1/devices/3b-0000001921e8/w1_slave"]
+
 if __name__ == "__main__":
     for i in range(15):
         test = read_temp(sensor="/sys/bus/w1/devices/3b-0000001921e8/w1_slave")

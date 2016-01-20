@@ -34,3 +34,6 @@ class MyTestCase(unittest.TestCase):
     def test_read_temp_raises_exception_when_sensor_not_found(self):
         with self.assertRaises(SensorNotFoundException):
             sensor.read_temp("/foo/bar")
+
+    # TODO:
+    # make test for find_temp_sensors()
