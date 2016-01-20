@@ -19,3 +19,7 @@ class MissingPropertyException(Exception):
 
 class InvalidPropertyException(Exception):
     pass
+
+
+class SensorNotFoundException(Exception):
+    pass
