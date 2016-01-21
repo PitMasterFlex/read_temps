@@ -15,6 +15,10 @@
 import argparse
 import sys
 
+from pitmaster.tools.display import LocalDisplay
+from pitmaster.tools import temps
+from pitmaster.tools import sensor
+
 
 def _setup_arg_parser():
     parser = argparse.ArgumentParser(
@@ -28,6 +32,26 @@ def _setup_arg_parser():
         action='store',
         help="Full path on file system where data is stored."
     )
+    parser.add_argument(
+        "-o",
+        "--output",
+        required=True,
+        action='store',
+        help="Full path on file system where output is stored"
+    )
+    parser.add_argument(
+        "-c",
+        "--cookname",
+        required=False,
+        action='store',
+        help="Friendly name to give your cook. Default is a time stamp."
+    )
+    parser.add_argument(
+        "-t",
+        "--tft",
+        action='store_true',
+        help="Enable the LCD display or not. It is disabled by default."
+    )
     return parser
 
 
@@ -39,6 +63,23 @@ def execute():
     parser = _setup_arg_parser()
     provided_args = parser.parse_args(sys.argv[1:])
     data_dir = provided_args.datadir
+    cook_name = provided_args.cookname
+    output_file = provided_args.output
+    use_lcd = provided_args.tft
+    sensors = sensor.find_temp_sensors()
+    if use_lcd:
+        display = LocalDisplay()
+        display.set_display_msg("Welcome!")
+    while True:
+        for sen in sensors:
+            temp_c = sensor.read_temp(sen["location"])
+            temp_f = temps.from_c_to_f(temp=temp_c)
+            if use_lcd:
+                display.check_events()
+                display.set_display_msg("{}: {}".format(
+                    sen["name"],
+                    temp_f
+                ))
 
 
 if __name__ == "__main__":

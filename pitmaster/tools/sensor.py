@@ -54,8 +54,13 @@ def find_temp_sensors():
 
     :return list: List containing all sensors.
     """
-    # Hard coded for now while we work out the best way to hand this.
-    return ["/sys/bus/w1/devices/3b-0000001921e8/w1_slave"]
+    # Hard coded for now while we work out the best way to handel this.
+    return [
+        {
+            "name": "Probe 1",
+            "location": "/sys/bus/w1/devices/3b-0000001921e8/w1_slave"
+        }
+    ]
 
 if __name__ == "__main__":
     for i in range(15):
