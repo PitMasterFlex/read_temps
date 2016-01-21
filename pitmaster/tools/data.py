@@ -13,6 +13,7 @@
 #   limitations under the License.
 from CodernityDB.database_thread_safe import ThreadSafeDatabase as Database
 from CodernityDB.hash_index import HashIndex
+from CodernityDB.database import DatabaseConflict
 
 from pitmaster.exceptions import *
 
@@ -27,10 +28,16 @@ class DBObject(object):
         """
         self.db = Database(filename)
         if self.db.exists():
-            self.db.open()
+            self._open_db()
             self.db.reindex()
         else:
             self.db.create()
+
+    def _open_db(self):
+        try:
+            self.db.open()
+        except DatabaseConflict:
+            pass
 
     def save(self, info=None):
         """
@@ -40,7 +47,7 @@ class DBObject(object):
         """
         if info is None:
             raise MissingPropertyException("info must not be None!")
-        self.db.open()
+        self._open_db()
         self.db.insert(info)
 
     def reindex(self):
@@ -48,6 +55,6 @@ class DBObject(object):
         Does a reindex of the database.
         :return:
         """
-        self.db.open()
+        self._open_db()
         self.db.reindex()
 
