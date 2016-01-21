@@ -12,7 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from CodernityDB.database_thread_safe import ThreadSafeDatabase as Database
-from CodernityDB.hash_index import HashIndex
 from CodernityDB.database import DatabaseConflict
 
 from pitmaster.exceptions import *
@@ -57,4 +56,7 @@ class DBObject(object):
         """
         self._open_db()
         self.db.reindex()
+
+    def list_all(self):
+        return self.db.all("id")
 

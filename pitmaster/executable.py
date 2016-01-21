@@ -13,7 +13,6 @@
 #   limitations under the License.
 
 import argparse
-import datetime
 import sys
 import time
 
@@ -97,6 +96,8 @@ def execute():
                 time.sleep(3)
     except KeyboardInterrupt:
         print
+        for i in data_obj.list_all():
+            print i
         raise SystemExit
 
 
