@@ -13,11 +13,14 @@
 #   limitations under the License.
 
 import argparse
+import datetime
 import sys
+import time
 
 from pitmaster.tools.display import LocalDisplay
 from pitmaster.tools import temps
 from pitmaster.tools import sensor
+from pitmaster.tools.data import DBObject
 
 
 def _setup_arg_parser():
@@ -28,7 +31,7 @@ def _setup_arg_parser():
     parser.add_argument(
         '-d',
         '--datadir',
-        required=True,
+        required=False,
         action='store',
         help="Full path on file system where data is stored."
     )
@@ -37,7 +40,8 @@ def _setup_arg_parser():
         "--output",
         required=True,
         action='store',
-        help="Full path on file system where output is stored"
+        help="Full path on file system where output is stored. "
+             "This should be a directory, and should already exist."
     )
     parser.add_argument(
         "-c",
@@ -67,19 +71,33 @@ def execute():
     output_file = provided_args.output
     use_lcd = provided_args.tft
     sensors = sensor.find_temp_sensors()
+    data_obj = DBObject(filename=output_file)
     if use_lcd:
         display = LocalDisplay()
         display.set_display_msg("Welcome!")
-    while True:
-        for sen in sensors:
-            temp_c = sensor.read_temp(sen["location"])
-            temp_f = temps.from_c_to_f(temp=temp_c)
-            if use_lcd:
-                display.check_events()
-                display.set_display_msg("{}: {}".format(
-                    sen["name"],
-                    temp_f
-                ))
+    try:
+        while True:
+            for sen in sensors:
+                temp_c = sensor.read_temp(sen["location"])
+                temp_f = temps.from_c_to_f(temp=temp_c)
+                info = {
+                    "date": time.time(),
+                    "temp_f": temp_f,
+                    "temp_c": temp_c,
+                    "probe_name": sen["name"],
+                    "cook_name": cook_name
+                }
+                data_obj.save(info=info)
+                if use_lcd:
+                    display.check_events()
+                    display.set_display_msg("{}: {}f".format(
+                        sen["name"],
+                        temp_f
+                    ))
+                time.sleep(3)
+    except KeyboardInterrupt:
+        print
+        raise SystemExit
 
 
 if __name__ == "__main__":
