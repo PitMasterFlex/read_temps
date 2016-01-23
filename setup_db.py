@@ -22,15 +22,14 @@ db = sqlite3.connect(DB_FILE)
 cursor = db.cursor()
 
 query = """
-CREATE TABLE `cook_data_entry` (
-	`id`	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`date`	TEXT,
-	`temp_f`	INTEGER,
-	`temp_c`	INTEGER,
-	`probe_name`	TEXT,
-	`cook_name`	TEXT,
-	PRIMARY KEY(id,cook_name)
-);
+CREATE TABLE "cook_data_entry" (
+    `id`    INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
+    `date`  TEXT,
+    `temp_f`    INTEGER,
+    `temp_c`    INTEGER,
+    `probe_name`    TEXT,
+    `cook_name` TEXT
+)
 """
 
 cursor.execute(query)

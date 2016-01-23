@@ -40,7 +40,8 @@ class DBObject(object):
         if info is None:
             raise MissingPropertyException("info must not be None!")
         conn = self.db.cursor()
-        conn.execute("Insert into cook_data_entry VALUES (?,?,?,?,?)", (
+        conn.execute("Insert into cook_data_entry VALUES (?,?,?,?,?,?)", (
+            None,
             info["date"],
             info["temp_f"],
             info["temp_c"],
