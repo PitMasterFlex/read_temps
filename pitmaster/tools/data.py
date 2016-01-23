@@ -11,8 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from CodernityDB.database_thread_safe import ThreadSafeDatabase as Database
-from CodernityDB.database import DatabaseConflict
+import sqlite3
 
 from pitmaster.exceptions import *
 
@@ -25,18 +24,12 @@ class DBObject(object):
         :param filename:
         :return:
         """
-        self.db = Database(filename)
-        if self.db.exists():
-            self._open_db()
-            self.db.reindex()
-        else:
-            self.db.create()
+        self.filename = filename
+        self.db = sqlite3.connect(self.filename)
+        self.db.row_factory = sqlite3.Row
 
-    def _open_db(self):
-        try:
-            self.db.open()
-        except DatabaseConflict:
-            pass
+    def _renew_connection(self):
+        self.db = sqlite3.connect(self.filename)
 
     def save(self, info=None):
         """
@@ -46,17 +39,37 @@ class DBObject(object):
         """
         if info is None:
             raise MissingPropertyException("info must not be None!")
-        self._open_db()
-        self.db.insert(info)
+        conn = self.db.cursor()
+        conn.execute("Insert into cook_data_entry VALUES (?,?,?,?,?)", (
+            info["date"],
+            info["temp_f"],
+            info["temp_c"],
+            info["probe_name"],
+            info["cook_name"]
+        ))
+        self.db.commit()
 
-    def reindex(self):
+    def list_all_by_cook(self, cook_name=None):
         """
-        Does a reindex of the database.
+        Return all entries in the database for a given cook.
+
+        :param cook_name:
         :return:
         """
-        self._open_db()
-        self.db.reindex()
+        conn = self.db.cursor()
+        query = conn.execute("Select * from cook_data_entry where cook_name=?",
+                             cook_name)
+        info = query.fetchall()
+        return info
 
-    def list_all(self):
-        return self.db.all("id")
-
+    def get(self, entry_id=None):
+        """
+        Return a temp_event entry based on its id.
+        :param entry_id:
+        :param max_results:
+        :return:
+        """
+        conn = self.db.cursor()
+        query = conn.execute("SELECT * from cook_data_entry where id=?", entry_id)
+        info = query.fetchone()
+        return info
