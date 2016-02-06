@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/PitMasterFlex/read_temps.svg?branch=master
+    :target: https://travis-ci.org/PitMasterFlex/read_temps
+
 pitmasterflex is a python tool that is used to control temp sensors and various other things on a raspberry pi
 
 
@@ -35,4 +38,5 @@ Check out our videos on `YouTube <https://youtube.com/>`_.
 Parts List
 ==========
 Looking for a list of parts you need to buy for your raspberry pi to turn it into a BBQ PitMasterFlex?
-Look no further: `Parts List <https://github.com/bunchc/read_temps/parts.md>`_.
+
+Look no further: `Parts List <https://github.com/PitMasterFlex/read_temps/parts.md>`_.
