@@ -12,6 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 import os
+import re
 import time
 
 from pitmaster.exceptions import *
@@ -48,19 +49,32 @@ def read_temp(sensor=None, offset=None):
         return temp_c
 
 
-def find_temp_sensors():
+def find_temp_sensors(base_path=None, sensor_pat=None):
     """
     Looks on system for temp sensors and returns all that it finds in a list
 
+    :param sensor_pat:
+    :param base_path:
     :return list: List containing all sensors.
     """
-    # Hard coded for now while we work out the best way to handel this.
-    return [
-        {
-            "name": "Probe 1",
-            "location": "/sys/bus/w1/devices/3b-0000001921e8/w1_slave"
-        }
-    ]
+    if base_path is None:
+        base_path = "/sys/bus/w1/devices"
+    if sensor_pat is None:
+        sensor_pat = '3b-\d+.*'
+    all_dirs = os.listdir(base_path)
+    sensors = []
+    num = 1
+    for sensor_dir in all_dirs:
+        sensor = re.search(sensor_pat, sensor_dir)
+        if sensor is not None:
+            sensors.append(
+                    {"name": "Probe {}".format(num),
+                     "location": "{}".format(base_path + "/" +
+                                             sensor.string + "/w1_slave")
+                     })
+            num += 1
+
+    return sensors
 
 if __name__ == "__main__":
     for i in range(15):
