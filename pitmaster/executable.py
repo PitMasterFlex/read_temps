@@ -67,7 +67,7 @@ def execute():
     provided_args = parser.parse_args(sys.argv[1:])
     data_dir = provided_args.datadir
     cook_name = provided_args.cookname
-    output_file = provided_args.output
+    output_file = "/home/pi/pitmaster_flex.sq3"
     use_lcd = provided_args.tft
     sensors = sensor.find_temp_sensors()
     data_obj = DBObject(filename=output_file)
@@ -96,7 +96,7 @@ def execute():
                 time.sleep(3)
     except KeyboardInterrupt:
         print
-        for i in data_obj.list_all():
+        for i in data_obj.list_all_by_cook(cook_name=cook_name):
             print i
         raise SystemExit
 
