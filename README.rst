@@ -23,7 +23,7 @@ Interested in helping? We need awesome people of all kinds! Check the wiki for t
 Reporting Issues
 ================
 To report a problem with pitmasterflex or to make a feature request open an
-`issue <https://github.com/bunchc/read_temps/issues>`_ on GitHub.
+`issue <https://github.com/PitMasterFlex/read_temps/issues>`_ on GitHub.
 
 
 Community
@@ -39,4 +39,4 @@ Parts List
 ==========
 Looking for a list of parts you need to buy for your raspberry pi to turn it into a BBQ PitMasterFlex?
 
-Look no further: `Parts List <https://github.com/PitMasterFlex/read_temps/parts.md>`_.
+Look no further: `Parts List <https://github.com/PitMasterFlex/read_temps/wiki/Parts-List>`_.
